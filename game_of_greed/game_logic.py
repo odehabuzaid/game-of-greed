@@ -33,9 +33,11 @@ class GameLogic:
         if appears >= 3 and number != 1:score+= (number *100) * (appears-2)
         if appears < 3 and number == 1: score+= 100*appears
         if appears < 3 and number == 5: score+= 50*appears
+    
+    
     return score
-  
 
+  
   @staticmethod
   def roll_dice(roll=6):
     """
@@ -56,13 +58,13 @@ def check_straight_or_pairs(rolled):
   
   Args:
       rolled (tuple): a list of random integers, each represent a random dice roll.
-
+  
   Returns:
       int: calculated score as a result of rolling the dice's based on the game rules.
   """
   score = 0
   if len(rolled) == 6:
-    straight =  all(value == 1 for value in rolled.values())
+    straight =  all(value == 1 or value ==2 for value in rolled.values())
     if straight:
       score = 1500
   
@@ -70,4 +72,5 @@ def check_straight_or_pairs(rolled):
     three_pairs = all(value == 2 for value in rolled.values())
     if three_pairs:
       score = 750 * 2
+      
   return score
