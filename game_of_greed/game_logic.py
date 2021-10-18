@@ -12,10 +12,17 @@ class GameLogic:
   def __init__(self):
     self.score = 0
     
-
-  
   @staticmethod
   def calculate_score(rolled):
+    """
+    Handle calculating score for dice roll
+
+    Args:
+        rolled (tuple): a list of random integers, each represent a random dice roll.
+
+    Returns:
+        int: calculated score as a result of rolling the dice's based on the game rules.
+    """
     rolled = Counter(rolled)
     score = check_straight_or_pairs(rolled)
     
@@ -31,18 +38,36 @@ class GameLogic:
 
   @staticmethod
   def roll_dice(roll=6):
+    """
+    aHandle rolling dice
+
+    Args:
+        roll (int, optional): how many dices to roll. Defaults to 6.
+    
+    Returns:
+         rolls (tuple): a list of random integers, each represent a random dice roll.
+    """
     rolls = tuple(randint(1,6) for _ in range(roll))
     return rolls
 
 def check_straight_or_pairs(rolled):
-    score = 0
-    if len(rolled) == 6:
-      straight =  all(value == 1 for value in rolled.values())
-      if straight:
-        score = 1500
+  """
+  checking weather the result of rolling dice contains the pattern of straight or three pairs
+  
+  Args:
+      rolled (tuple): a list of random integers, each represent a random dice roll.
 
-    if len(rolled) == 3:
-      three_pairs = all(value == 2 for value in rolled.values())
-      if three_pairs:
-        score = 750 * 2
-    return score
+  Returns:
+      int: calculated score as a result of rolling the dice's based on the game rules.
+  """
+  score = 0
+  if len(rolled) == 6:
+    straight =  all(value == 1 for value in rolled.values())
+    if straight:
+      score = 1500
+  
+  if len(rolled) == 3:
+    three_pairs = all(value == 2 for value in rolled.values())
+    if three_pairs:
+      score = 750 * 2
+  return score
