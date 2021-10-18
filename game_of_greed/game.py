@@ -14,9 +14,11 @@ class Game:
     def play(self, roller):
         user_input = ""
         if self.rounds == 1:
+            
             print("Welcome to Game of Greed")
             print("(y)es to play or (n)o to decline")
             user_input = input("> ")
+        self.dice = 6
         if user_input == "n":
             print("OK. Maybe another time")
             exit()
