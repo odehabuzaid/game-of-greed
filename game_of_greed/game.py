@@ -11,7 +11,7 @@ class Game:
         self.score = 0
         self.banker = Banker()
 
-    def play(self, roller=6):
+    def play(self, roller):
         user_input = ""
         if self.rounds == 1:
             print("Welcome to Game of Greed")
@@ -25,8 +25,7 @@ class Game:
             print("Rolling 6 dice...")
             #
             rolls = roller(self.dice)
-            rolls = " ".join(map(str, rolls))
-            print("*** {} ***".format(rolls))
+            print("*** {} ***".format(" ".join(map(str, rolls))))
             print("Enter dice to keep, or (q)uit:")
             user_input = input("> ")
             if user_input == "q":
@@ -36,7 +35,8 @@ class Game:
                     )
                 )
             else:
-                calculated = GameLogic.calculate_score(tuple([4, 2, 6, 4, 6, 5]))
+                
+                calculated = GameLogic.calculate_score(tuple(rolls))
                 self.banker.shelf(calculated)
                 self.calculate_dice(user_input)
                 print(
@@ -54,7 +54,7 @@ class Game:
                     )
                     print("Total score is {} points".format(self.banker.bank()))
                     self.rounds += 1
-                    self.play()
-
+                    self.play(roller)
+    
     def calculate_dice(self, input):
         self.dice -= len(input)
