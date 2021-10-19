@@ -29,3 +29,4 @@ def test_clear_shelf():
     banker.clear_shelf()
     assert banker.balance == 100
     assert banker.shelved == 0
+

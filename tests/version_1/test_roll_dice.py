@@ -68,3 +68,4 @@ def test_all_dice(dice_number, expected):
 
     for value in values:
         assert 1 <= value <= 6
+
