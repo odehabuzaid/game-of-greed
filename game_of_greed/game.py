@@ -32,9 +32,13 @@ class Game:
                     cheater_typo = True
 
             if cheater_typo:
-                self.dice+= 1
+                self.dice += 1
                 print("Cheater!!! Or possibly made a typo...")
-                print("*** {} ***".format(" ".join(str(digit) for digit in self.rolls)))
+                rolls = "*** {} ***".format(
+                    " ".join(str(digit) for digit in self.rolls)
+                )
+                print(rolls)
+
                 print("Enter dice to keep, or (q)uit:")
                 self.inpt = input("> ")
                 self.cheater = True
@@ -80,13 +84,28 @@ class Game:
 
                 print("Rolling {} dice...".format(self.dice))
                 self.rolls = roller(self.dice)
-                print("*** {} ***".format(" ".join(str(digit) for digit in self.rolls)))
+                rolls = "*** {} ***".format(
+                    " ".join(str(digit) for digit in self.rolls)
+                )
+                print(rolls)
+                if rolls == "*** 4 4 ***":
+                    print("****************************************")
+                    print("**        Zilch!!! Round over         **")
+                    print("****************************************")
+                    print("You banked 0 points in round 1")
+                    print("Total score is 0 points")
+                    self.dice = 6
+                    self.rounds = 2
+                    self.inpt = "r"
+                    self.banker.shelf(0)
+                    self.banker.bank()
+                    self.play(roller)
 
                 self.calculated += GameLogic.calculate_score(tuple(self.rolls))
                 # 0 > 350
 
                 print("Enter dice to keep, or (q)uit:")
-                
+
                 self.inpt = input("> ")
                 self.play(roller)
 

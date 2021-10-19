@@ -80,7 +80,7 @@ class GameLogic:
                 score = 1500
 
         return score
-
+    
     @staticmethod
     def get_scorers(rolls):
         if len(rolls) == 0:
@@ -95,3 +95,8 @@ class GameLogic:
             return tuple([1, 5])
         elif any(value != 1 and value != 5 for value in rolls):
             return tuple()
+    @staticmethod
+    def validate_keepers(roll, keepers):
+       keep = GameLogic.get_scorers(roll)
+       return keep[::-1] == keepers
+      
