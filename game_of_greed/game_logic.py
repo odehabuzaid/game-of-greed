@@ -46,7 +46,7 @@ class GameLogic:
                     score += 50 * appears
 
         return score
-
+    
     @staticmethod
     def roll_dice(roll=6):
         """
@@ -65,7 +65,7 @@ class GameLogic:
     def check_straight_or_pairs(rolled):
         """
         checking weather the result of rolling dice contains the pattern of straight or three pairs
-        
+
         Args:
             rolled (tuple): a list of random integers, each represent a random dice roll.
 
@@ -78,25 +78,21 @@ class GameLogic:
             three_pairs = all(value == 2 for value in rolled.values())
             if straight or three_pairs:
                 score = 1500
-        
+
         return score
-    
+
     @staticmethod
     def get_scorers(rolls):
         if len(rolls) == 0:
             return rolls
         if 1 in rolls and 5 not in rolls:
-            return tuple(
-                [
-                    1,
-                ]
-            )
+            return tuple([1,])
         elif 1 in rolls and 5 in rolls:
             return tuple([1, 5])
         elif any(value != 1 and value != 5 for value in rolls):
             return tuple()
+
     @staticmethod
     def validate_keepers(roll, keepers):
-       keep = GameLogic.get_scorers(roll)
-       return keep[::-1] == keepers
-      
+        keep = GameLogic.get_scorers(roll)
+        return keep[::-1] == keepers
