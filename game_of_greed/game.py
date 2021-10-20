@@ -8,29 +8,63 @@ class Game:
     roller = GameLogic.roll_dice
 
     def __init__(self):
+        """
+        banker => Banker CLass instance : used to perform banking operations for player.
+
+        rounds => integer : perform as a counter for the rounds being played.
+
+        dice => integer   : perform as a counter for player remaining dice.
+
+        state => string   : holds the game state
+
+                  values  : started > means that the game is currently being played.
+                            new > the begining of a new game.
+
+        choice => string  : holds the last user input value.
+
+        calculated =>
+                    integer : holds the current player score that not yet Baker or shelved.
+
+                    note    : possible bug in the calculation process.
+
+        rolls =>      tuple : holds the previously reolled dice values
+
+        cheater =>
+        =======================
+        methods :
+
+        play : instance method
+             gameplay
+
+             args :
+                self : [object] represent class  Game instance.
+
+                roller: [reference] dice roller function method imported from GameLogic class.
+
+                    args : integer = > represent dice count.
+
+                    return : tuple = > random dice value for each dice.
+        """
         self.rounds = 1
         self.dice = 6
         self.banker = Banker()
-        self.state = "new"
-        self.choice = "y"
+        self.state = "new"  # > started
+        self.choice = "y"  # y >
         self.calculated = 0
         self.rolls = None
         self.cheater = False
 
     def play(self, roller=roller):
-        def get_user_input(self,roller):
+        def get_user_input():
             self.choice = input("> ")
             self.play(roller)
         
-        def check_cheating(self, takes, rolls):
+        def check_cheating(takes, rolls):
             cheater_typo = False
-
             rollss = [int(x) for x in rolls if x != "*" and x != " "]
             takes = [int(x) for x in takes]
-
             rolls_counter = Counter(rollss)
             takes = Counter(takes)
-
             for key, value in takes.items():
                 if int(key) in rollss:
                     for k, v in rolls_counter.items():
@@ -41,48 +75,44 @@ class Game:
                                 cheater_typo = False
                 else:
                     cheater_typo = True
-
             if cheater_typo:
-
                 self.dice += 1
-
                 print("Cheater!!! Or possibly made a typo...")
-
                 rolls = "*** {} ***".format(
                     " ".join(str(digit) for digit in self.rolls)
                 )
-
                 print(rolls)
-
                 print("Enter dice to keep, or (q)uit:")
                 self.cheater = True
-                get_user_input(self,roller)
-    
-
+                get_user_input()
             else:
-                level("keep", self, roller)
+                player_choice("keep")
+        
+        def player_choice(choice):
+            def check_score():
+                score = GameLogic.calculate_score(self.rolls)
+                if score:
+                    self.calculated += score
+                    print("Enter dice to keep, or (q)uit:")
+                    get_user_input()
 
-        def check_zilch(self, rolled, roller):
-            if rolled == "*** 4 4 ***":
-                print("****************************************")
-                print("**        Zilch!!! Round over         **")
-                print("****************************************")
-                self.dice = 6
-                self.rounds = 1
-                self.banker.shelf(0)
-                self.calculated = 0
-                self.banker.bank()
-                level("bank", self, roller)
-
-        def level(level, self, roller):
-
-            if level == "bank":
+                else:
+                    print("****************************************")
+                    print("**        Zilch!!! Round over         **")
+                    print("****************************************")
+                    self.banker.shelf(0)
+                    self.calculated = 0
+                    self.banker.bank()
+                    self.dice = 6
+                    self.rounds = 1
+                    player_choice("bank")
+            
+            if choice == "bank":
                 print(
                     "You banked {} points in round {}".format(
                         self.calculated, self.rounds
                     )
                 )
-
                 self.banker.shelf(self.calculated)
                 self.banker.bank()
                 print("Total score is {} points".format(self.banker.bank()))
@@ -90,8 +120,8 @@ class Game:
                 self.dice = 6
                 self.choice = "r"
                 self.play(roller)
-
-            if level == "keep":
+            
+            if choice == "keep":
                 self.banker.shelf(self.calculated)
                 self.dice -= len(self.choice)
                 print(
@@ -101,9 +131,14 @@ class Game:
                 )
                 # 0 > 150
                 print("(r)oll again, (b)ank your points or (q)uit:")
-                get_user_input(self,roller)
+                get_user_input()
 
-            if level == "roll":
+            if choice == "roll":
+                # Should allow user to continue rolling with 6 new dice
+                # when all dice have scored in current turn.
+                # In this game build , player will reach this point with 0 dice left
+                # only if all dice have scored
+                # TODO [X] find another way to validate 0 dice left and all previous rolled dice scored
                 if self.dice == 0:
                     self.dice = 6
 
@@ -116,19 +151,13 @@ class Game:
                 )
 
                 print(rolls)
-                check_zilch(self, rolls, roller)
-
-                self.calculated += GameLogic.calculate_score(tuple(self.rolls))
-                # 0 > 350
-
-                print("Enter dice to keep, or (q)uit:")
-                get_user_input(self,roller)
-
+                check_score()
+                    
         if self.state == "new":
             print("Welcome to Game of Greed")
             print("(y)es to play or (n)o to decline")
             self.state = "started"
-            get_user_input(self,roller)
+            get_user_input()
 
         if self.choice == "n":
             print("OK. Maybe another time")
@@ -140,16 +169,16 @@ class Game:
 
         if self.choice == "y":
             print("Starting round {}".format(self.rounds))
-            level("roll", self, roller)
-        
+            player_choice("roll")
+
         if self.choice == "r":
             if self.rounds > 1:
                 print("Starting round {}".format(self.rounds))
-            level("roll", self, roller)
+            player_choice("roll")
 
         if self.choice == "b":
-            level("bank", self, roller)
+            player_choice("bank")
 
         digits = self.choice.replace(" ", "")
         if digits.isdigit():
-            check_cheating(self, digits, self.rolls)
+            check_cheating(digits, self.rolls)
