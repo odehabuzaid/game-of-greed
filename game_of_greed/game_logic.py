@@ -65,7 +65,7 @@ class GameLogic:
     def check_straight_or_pairs(rolled):
         """
         checking weather the result of rolling dice contains the pattern of straight or three pairs
-
+        
         Args:
             rolled (tuple): a list of random integers, each represent a random dice roll.
 
@@ -78,7 +78,7 @@ class GameLogic:
             three_pairs = all(value == 2 for value in rolled.values())
             if straight or three_pairs:
                 score = 1500
-
+        
         return score
     
     @staticmethod

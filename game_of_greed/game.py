@@ -9,9 +9,9 @@ class Game:
         self.rounds = 1
         self.dice = 6
         self.banker = Banker()
-        self.state = "new"  # -> started
-        self.inpt = "y"
-        self.calculated = 0  # -> 350
+        self.state = "new"
+        self.choice = "y"
+        self.calculated = 0
         self.rolls = None
         self.cheater = False
 
@@ -26,11 +26,12 @@ class Game:
                 if int(key) in rollss:
                     for k, v in rolls_counter.items():
                         if k == key:
-                            if v != value:
+                            if v < value:
                                 cheater_typo = True
+                            else:
+                                cheater_typo = False
                 else:
                     cheater_typo = True
-
             if cheater_typo:
                 self.dice += 1
                 print("Cheater!!! Or possibly made a typo...")
@@ -40,7 +41,7 @@ class Game:
                 print(rolls)
 
                 print("Enter dice to keep, or (q)uit:")
-                self.inpt = input("> ")
+                self.choice = input("> ")
                 self.cheater = True
                 self.play(roller)
 
@@ -61,12 +62,12 @@ class Game:
                 print("Total score is {} points".format(self.banker.bank()))
                 self.rounds += 1
                 self.dice = 6
-                self.inpt = "r"
+                self.choice = "r"
                 self.play(roller)
 
             if level == "keep":
                 self.banker.shelf(self.calculated)
-                self.dice -= len(self.inpt)
+                self.dice -= len(self.choice)
                 print(
                     "You have {} unbanked points and {} dice remaining".format(
                         self.calculated, self.dice
@@ -75,7 +76,7 @@ class Game:
                 # 0 > 150
                 print("(r)oll again, (b)ank your points or (q)uit:")
                 temp = input("> ")
-                self.inpt = temp
+                self.choice = temp
                 self.play(roller)
 
             if level == "roll":
@@ -96,7 +97,7 @@ class Game:
                     print("Total score is 0 points")
                     self.dice = 6
                     self.rounds = 2
-                    self.inpt = "r"
+                    self.choice = "r"
                     self.banker.shelf(0)
                     self.banker.bank()
                     self.play(roller)
@@ -106,37 +107,37 @@ class Game:
 
                 print("Enter dice to keep, or (q)uit:")
 
-                self.inpt = input("> ")
+                self.choice = input("> ")
                 self.play(roller)
 
         if self.state == "new":
             print("Welcome to Game of Greed")
             print("(y)es to play or (n)o to decline")
-            self.inpt = input("> ")
+            self.choice = input("> ")
             self.state = "started"
             self.play(roller)
-
-        if self.inpt == "n":
+        
+        if self.choice == "n":
             print("OK. Maybe another time")
             exit()
 
-        if self.inpt == "q":
+        if self.choice == "q":
             print("Thanks for playing. You earned {} points".format(self.banker.bank()))
             exit()
 
-        if self.inpt == "y":
+        if self.choice == "y":
             self.state = "started"
             print("Starting round {}".format(self.rounds))
             level("roll", self, roller)
 
-        if self.inpt == "r":
+        if self.choice == "r":
             if self.rounds > 1:
                 print("Starting round {}".format(self.rounds))
             level("roll", self, roller)
 
-        if self.inpt == "b":
+        if self.choice == "b":
             level("bank", self, roller)
 
-        digits = self.inpt.replace(" ", "")
+        digits = self.choice.replace(" ", "")
         if digits.isdigit():
             check_cheating(self, digits, self.rolls)
