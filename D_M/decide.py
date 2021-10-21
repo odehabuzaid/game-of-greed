@@ -96,7 +96,7 @@ class DesicionMaker:
         def decide_save():
             desicion,remaining = self.decide()
             take_next_risk = True if len(remaining) > 3 else False
-            yield [desicion,take_next_risk]
+            yield [desicion,remaining]
             self.history_list.insert(tuple([desicion,take_next_risk]))
             
         # desicion = self.history_list.includes(rolled) 

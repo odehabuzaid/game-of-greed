@@ -13,7 +13,7 @@ from game_of_greed.game_logic import GameLogic
 class BaseBot(ABC):
     """Base class for Game of Greed bots"""
 
-    def __init__(self, print_all=False):
+    def __init__(self, print_all=True):
         self.last_print = ""
         self.last_roll = []
         self.print_all = print_all
@@ -153,14 +153,14 @@ class Bot(BaseBot):
     def _roll_bank_or_quit(self):
         choice = "r" if len(self.last_choice)>3  else "b"
 
+
+        
         if len(choice) < 1:
             tup = [int(x) for x in self.last_choice if x != '*' and x != ' ']
-
             last_score =  GameLogic.calculate_score(tup)
-
             if last_score > 1000 : choice = "b"
 
-            if len(self.SR_results[0][1]) == 2 : choice = "b"
+        if len(self.SR_results[0][1]) == 2 : choice = "b"
         
         self.report("\u001b[32m > " + str(choice) + "\u001b[37m")
 
@@ -169,10 +169,10 @@ class Bot(BaseBot):
     
 if __name__ == "__main__":
 
-   for _ in range(5):
-        num_games = 1
+
+        num_games = 2
         NervousNellie.play(num_games)
         Bot.play(num_games)
-
+        
     
     
