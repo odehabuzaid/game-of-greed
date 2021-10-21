@@ -6,7 +6,7 @@ from game_of_greed.game_logic import GameLogic
 
 class Game:
     roller = GameLogic.roll_dice
-
+    
     def __init__(self):
         """
         banker => Banker CLass instance : used to perform banking operations for player.
@@ -53,7 +53,7 @@ class Game:
         self.calculated = 0
         self.rolls = None
         self.cheater = False
-
+    
     def play(self, roller=roller):
         def get_user_input():
             self.choice = input("> ")
@@ -106,7 +106,7 @@ class Game:
                     self.dice = 6
                     self.rounds = 1
                     player_choice("bank")
-            
+
             if choice == "bank":
                 print(
                     "You banked {} points in round {}".format(
@@ -116,11 +116,15 @@ class Game:
                 self.banker.shelf(self.calculated)
                 self.banker.bank()
                 print("Total score is {} points".format(self.banker.bank()))
-                self.rounds += 1
-                self.dice = 6
-                self.choice = "r"
+                if self.rounds < 6:
+                    self.rounds += 1 
+                    self.dice = 6
+                    self.choice = "r"
+                else:
+                    self.choice = "q"
+
                 self.play(roller)
-            
+
             if choice == "keep":
                 self.banker.shelf(self.calculated)
                 self.dice -= len(self.choice)
@@ -152,33 +156,38 @@ class Game:
 
                 print(rolls)
                 check_score()
-                    
+
+        
         if self.state == "new":
             print("Welcome to Game of Greed")
             print("(y)es to play or (n)o to decline")
             self.state = "started"
             get_user_input()
-
+        
         if self.choice == "n":
             print("OK. Maybe another time")
             exit()
-
+        
         if self.choice == "q":
             print("Thanks for playing. You earned {} points".format(self.banker.bank()))
             exit()
-
+        
         if self.choice == "y":
             print("Starting round {}".format(self.rounds))
             player_choice("roll")
-
+        
         if self.choice == "r":
             if self.rounds > 1:
                 print("Starting round {}".format(self.rounds))
             player_choice("roll")
-
+        
         if self.choice == "b":
             player_choice("bank")
-
+        
         digits = self.choice.replace(" ", "")
         if digits.isdigit():
             check_cheating(digits, self.rolls)
+
+        if self.choice == "":
+            self.choice = 'r'
+            self.play(roller)

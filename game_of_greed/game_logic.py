@@ -5,16 +5,16 @@ from random import randint
 class GameLogic:
     """
     this class will control the basic game features:
-
+    
     calculate_score
-
+    
     roll_dice
-
+    
     """
-
+    
     def __init__(self):
         self._check_score = 0
-
+    
     @staticmethod
     def calculate_score(rolled):
         """
@@ -28,7 +28,7 @@ class GameLogic:
         """
         rolled = Counter(rolled)
         score = GameLogic.check_straight_or_pairs(rolled)
-
+        
         if not score:
             for number in rolled:
                 appears = rolled[number]
@@ -60,7 +60,7 @@ class GameLogic:
         """
         rolls = tuple(randint(1, 6) for _ in range(roll))
         return rolls
-
+    
     @staticmethod
     def check_straight_or_pairs(rolled):
         """
@@ -80,7 +80,7 @@ class GameLogic:
                 score = 1500
 
         return score
-
+    
     @staticmethod
     def get_scorers(rolls):
         if len(rolls) == 0:
@@ -91,8 +91,10 @@ class GameLogic:
             return tuple([1, 5])
         elif any(value != 1 and value != 5 for value in rolls):
             return tuple()
-
+    
     @staticmethod
     def validate_keepers(roll, keepers):
         keep = GameLogic.get_scorers(roll)
         return keep[::-1] == keepers
+
+    
