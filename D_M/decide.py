@@ -1,5 +1,4 @@
 from collections import Counter
-from contextlib import contextmanager
 from random import randint
 
 
@@ -16,7 +15,7 @@ class HistoryList:
     def __init__(self):
         self.head = None
         self.tail = None
-
+    
     def insert(self, value=None):
         """
         Adds a new node with that value to the head of the list with an O(1) Time performance.
@@ -68,17 +67,17 @@ class DesicionMaker:
                 self.score += (number * 1000) * (appears - 2)
                 for _ in range(appears):
                     result.append(number)
-
+            
             if appears >= 3 and number != 1:
                 self.score += (number * 100) * (appears - 2)
                 for _ in range(appears):
                     result.append(number)
-
+            
             if appears < 3 and number == 1:
                 self.score += 100 * appears
                 for _ in range(appears):
                     result.append(number)
-
+            
             if appears < 3 and number == 5:
                 self.score += 50 * appears
                 for _ in range(appears):
@@ -86,9 +85,9 @@ class DesicionMaker:
         
         remaining = [x for x in self.rolled  if x not in tuple(result)]
         desicion = "".join(str(digit) for digit in result)
-
+        
         return desicion,remaining
-
+    
     def determin(self,rolled):
         self.rolled = Counter(rolled)
         

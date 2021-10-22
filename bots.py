@@ -13,7 +13,7 @@ from game_of_greed.game_logic import GameLogic
 class BaseBot(ABC):
     """Base class for Game of Greed bots"""
 
-    def __init__(self, print_all=True):
+    def __init__(self, print_all=False):
         self.last_print = ""
         self.last_roll = []
         self.print_all = print_all
@@ -41,8 +41,8 @@ class BaseBot(ABC):
             score = re.sub("\D", "", text)
             self.total_score += int(score)
         elif self.print_all:
-            self.real_print(text) 
-    
+            self.real_print(text)
+
     def _mock_print(self, *args, **kwargs):
         """steps in front of the real builtin print function"""
 
@@ -62,7 +62,7 @@ class BaseBot(ABC):
         elif line.startswith("*** "):
 
             self.last_roll = [int(ch) for ch in line if ch.isdigit()]
-        
+
         else:
             self.last_print = line
 
@@ -93,11 +93,14 @@ class BaseBot(ABC):
 
         roll_string = ""
         
+        
+        # NoneType is not iterable, fixed with
+        roll = [''] if roll is None else roll
         for value in roll:
             roll_string += str(value)
-        
-        self.report("> " + roll_string)
 
+        self.report("> " + roll_string)
+        
         return roll_string
     
     @abstractmethod
@@ -134,45 +137,43 @@ class BaseBot(ABC):
 
 class NervousNellie(BaseBot):
     """NervousNellie banks the first roll always"""
-    
+
     def _roll_bank_or_quit(self):
         return "b"
 
-class Bot(BaseBot):
-    
+
+class Sharper(BaseBot):
     def _enter_dice(self):
         self.SR_results = list(self.desicion_maker.determin(self.last_roll))
-
-        choice = self.SR_results[0][0] 
-        
+        choice = self.SR_results[0][0]
         self.last_choice = choice
 
         self.report("\u001b[33m > " + str(choice) + "\u001b[37m")
         return str(choice)
-    
+
     def _roll_bank_or_quit(self):
-        choice = "r" if len(self.last_choice)>3  else "b"
+
+        choice = "r" if len(self.last_choice) < 4 else "b"
+
+        if len(self.last_choice) > 1:
+            tup = [int(digit) for digit in self.last_choice]
+
+            last_score = GameLogic.calculate_score(tup)
+
+            choice = "b" if last_score > 1000 else choice
+
+        if len(self.SR_results[0][1]) == 2 or len(self.SR_results[0][1]) == 1:
+            choice = "b"
+
+        not_zilch = GameLogic.calculate_score(self.last_roll)
+
+        choice = choice if not_zilch else "b"
+
+        self.report("\u001b[32m > " + choice + "\u001b[37m")
+        return choice
 
 
-        
-        if len(choice) < 1:
-            tup = [int(x) for x in self.last_choice if x != '*' and x != ' ']
-            last_score =  GameLogic.calculate_score(tup)
-            if last_score > 1000 : choice = "b"
-
-        if len(self.SR_results[0][1]) == 2 : choice = "b"
-        
-        self.report("\u001b[32m > " + str(choice) + "\u001b[37m")
-
-        return str(choice)
-
-    
 if __name__ == "__main__":
-
-
-        num_games = 2
-        NervousNellie.play(num_games)
-        Bot.play(num_games)
-        
-    
-    
+    num_games = 2
+    NervousNellie.play(num_games)
+    Sharper.play(num_games)
