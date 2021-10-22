@@ -1,62 +1,193 @@
+from collections import Counter
+
 from game_of_greed.banker import Banker
 from game_of_greed.game_logic import GameLogic
 
-#
-
 
 class Game:
+    roller = GameLogic.roll_dice
+    
     def __init__(self):
+        """
+        banker => Banker CLass instance : used to perform banking operations for player.
+
+        rounds => integer : perform as a counter for the rounds being played.
+
+        dice => integer   : perform as a counter for player remaining dice.
+
+        state => string   : holds the game state
+
+                  values  : started > means that the game is currently being played.
+                            new > the begining of a new game.
+
+        choice => string  : holds the last user input value.
+
+        calculated =>
+                    integer : holds the current player score that not yet Baker or shelved.
+
+                    note    : possible bug in the calculation process.
+
+        rolls =>      tuple : holds the previously reolled dice values
+
+        cheater =>
+        =======================
+        methods :
+
+        play : instance method
+             gameplay
+
+             args :
+                self : [object] represent class  Game instance.
+
+                roller: [reference] dice roller function method imported from GameLogic class.
+
+                    args : integer = > represent dice count.
+
+                    return : tuple = > random dice value for each dice.
+        """
         self.rounds = 1
         self.dice = 6
-        self.score = 0
         self.banker = Banker()
+        self.state = "new"  # > started
+        self.choice = "y"  # y >
+        self.calculated = 0
+        self.rolls = None
+        self.cheater = False
+    
+    def play(self, roller=roller):
+        def get_user_input():
+            self.choice = input("> ")
+            self.play(roller)
+        
+        def check_cheating(takes, rolls):
+            cheater_typo = False
+            rollss = [int(x) for x in rolls if x != "*" and x != " "]
+            takes = [int(x) for x in takes]
+            rolls_counter = Counter(rollss)
+            takes = Counter(takes)
+            for key, value in takes.items():
+                if int(key) in rollss:
+                    for k, v in rolls_counter.items():
+                        if k == key:
+                            if v < value:
+                                cheater_typo = True
+                            else:
+                                cheater_typo = False
+                else:
+                    cheater_typo = True
+            if cheater_typo:
+                self.dice += 1
+                print("Cheater!!! Or possibly made a typo...")
+                rolls = "*** {} ***".format(
+                    " ".join(str(digit) for digit in self.rolls)
+                )
+                print(rolls)
+                print("Enter dice to keep, or (q)uit:")
+                self.cheater = True
+                get_user_input()
+            else:
+                player_choice("keep")
+        
+        def player_choice(choice):
+            def check_score():
+                score = GameLogic.calculate_score(self.rolls)
+                if score:
+                    self.calculated += score
+                    print("Enter dice to keep, or (q)uit:")
+                    get_user_input()
 
-    def play(self, roller):
-        user_input = ""
-        if self.rounds == 1:
-            
-            print("Welcome to Game of Greed")
-            print("(y)es to play or (n)o to decline")
-            user_input = input("> ")
-        self.dice = 6
-        if user_input == "n":
-            print("OK. Maybe another time")
-            exit()
-        else:
-            print("Starting round {}".format(self.rounds))
-            print("Rolling 6 dice...")
-            #
-            rolls = roller(self.dice)
-            print("*** {} ***".format(" ".join(map(str, rolls))))
-            print("Enter dice to keep, or (q)uit:")
-            user_input = input("> ")
-            if user_input == "q":
+                else:
+                    print("****************************************")
+                    print("**        Zilch!!! Round over         **")
+                    print("****************************************")
+                    self.banker.shelf(0)
+                    self.calculated = 0
+                    self.banker.bank()
+                    self.dice = 6
+                    self.rounds = 1
+                    player_choice("bank")
+
+            if choice == "bank":
                 print(
-                    "Thanks for playing. You earned {} points".format(
-                        self.banker.balance
+                    "You banked {} points in round {}".format(
+                        self.calculated, self.rounds
                     )
                 )
-            else:
-                
-                calculated = GameLogic.calculate_score(tuple(rolls))
-                self.banker.shelf(calculated)
-                self.calculate_dice(user_input)
+                self.banker.shelf(self.calculated)
+                self.banker.bank()
+                print("Total score is {} points".format(self.banker.bank()))
+                if self.rounds < 6:
+                    self.rounds += 1 
+                    self.dice = 6
+                    self.choice = "r"
+                else:
+                    self.choice = "q"
+
+                self.play(roller)
+
+            if choice == "keep":
+                self.banker.shelf(self.calculated)
+                self.dice -= len(self.choice)
                 print(
                     "You have {} unbanked points and {} dice remaining".format(
-                        calculated, self.dice
+                        self.calculated, self.dice
                     )
                 )
+                # 0 > 150
                 print("(r)oll again, (b)ank your points or (q)uit:")
-                user_input = input("> ")
-                if user_input == "b":
-                    print(
-                        "You banked {} points in round {}".format(
-                            calculated, self.rounds
-                        )
-                    )
-                    print("Total score is {} points".format(self.banker.bank()))
-                    self.rounds += 1
-                    self.play(roller)
-    
-    def calculate_dice(self, input):
-        self.dice -= len(input)
+                get_user_input()
+
+            if choice == "roll":
+                # Should allow user to continue rolling with 6 new dice
+                # when all dice have scored in current turn.
+                # In this game build , player will reach this point with 0 dice left
+                # only if all dice have scored
+                # TODO [X] find another way to validate 0 dice left and all previous rolled dice scored
+                if self.dice == 0:
+                    self.dice = 6
+
+                print("Rolling {} dice...".format(self.dice))
+
+                self.rolls = roller(self.dice)
+
+                rolls = "*** {} ***".format(
+                    " ".join(str(digit) for digit in self.rolls)
+                )
+
+                print(rolls)
+                check_score()
+
+        
+        if self.state == "new":
+            print("Welcome to Game of Greed")
+            print("(y)es to play or (n)o to decline")
+            self.state = "started"
+            get_user_input()
+        
+        if self.choice == "n":
+            print("OK. Maybe another time")
+            exit()
+        
+        if self.choice == "q":
+            print("Thanks for playing. You earned {} points".format(self.banker.bank()))
+            exit()
+        
+        if self.choice == "y":
+            print("Starting round {}".format(self.rounds))
+            player_choice("roll")
+        
+        if self.choice == "r":
+            if self.rounds > 1:
+                print("Starting round {}".format(self.rounds))
+            player_choice("roll")
+        
+        if self.choice == "b":
+            player_choice("bank")
+        
+        digits = self.choice.replace(" ", "")
+        if digits.isdigit():
+            check_cheating(digits, self.rolls)
+
+        if self.choice == "":
+            self.choice = 'r'
+            self.play(roller)

@@ -16,14 +16,14 @@ Rolling 6 dice...
 *** 5 2 3 2 1 4 ***
 Enter dice to keep, or (q)uit:
 > 15
-You have 150 unbanked points and 4 dice remaining
+You have 500 unbanked points and 4 dice remaining
 (r)oll again, (b)ank your points or (q)uit:
 > b
-You banked 150 points in round 2
-Total score is 500 points
+You banked 500 points in round 2
+Total score is 850 points
 Starting round 3
 Rolling 6 dice...
 *** 6 6 5 4 2 1 ***
 Enter dice to keep, or (q)uit:
 > q
-Thanks for playing. You earned 500 points
+Thanks for playing. You earned 850 points
